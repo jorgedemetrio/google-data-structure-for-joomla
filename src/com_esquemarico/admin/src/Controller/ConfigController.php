@@ -28,7 +28,15 @@ class ConfigController extends BaseController
     {
         $this->checkToken();
 
-        $app   = $this->app;
+        $app = $this->app;
+
+        // A configuração global é uma operação privilegiada: exige core.admin.
+        if (!$app->getIdentity()->authorise('core.admin', 'com_esquemarico')) {
+            $this->setRedirect(Route::_('index.php?option=com_esquemarico', false), Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+
+            return;
+        }
+
         $model = $this->getModel('Config');
         $form  = $model->getForm();
         $data  = $this->input->post->get('jform', [], 'array');
