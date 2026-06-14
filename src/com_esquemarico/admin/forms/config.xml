@@ -66,6 +66,14 @@
             label="ESR_CFG_SOCIAL_OTHER" description="ESR_CFG_SOCIAL_OTHER_DESC" />
     </fieldset>
 
+    <fieldset name="jsonld" label="ESR_CFG_JSONLD">
+        <field name="combine_graph" type="radio" layout="joomla.form.field.radio.switcher"
+            label="ESR_CFG_JSONLD_GRAPH" description="ESR_CFG_JSONLD_GRAPH_DESC" default="0">
+            <option value="0">JNO</option>
+            <option value="1">JYES</option>
+        </field>
+    </fieldset>
+
     <fieldset name="titles" label="ESR_CFG_TITLES">
         <field name="titles_note" type="note"
             label="ESR_CFG_TITLES" description="ESR_CFG_TITLES_DESC" />

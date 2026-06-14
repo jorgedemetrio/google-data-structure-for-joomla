@@ -127,7 +127,13 @@ final class Esquemarico extends CMSPlugin implements SubscriberInterface
         // Plugins de integração contribuem com seus blocos.
         EsquemaRicoHelper::event('onEsquemaRicoBeforeRender', [&$blocos]);
 
-        $markup = implode("\n", array_filter($blocos));
+        $blocos = array_filter($blocos);
+
+        if ($this->globais->get('combine_graph', 0)) {
+            $blocos = $this->combinarGraph($blocos);
+        }
+
+        $markup = implode("\n", $blocos);
 
         if (trim($markup) === '') {
             return null;
@@ -138,6 +144,59 @@ final class Esquemarico extends CMSPlugin implements SubscriberInterface
         }
 
         return "\n<!-- Início: Esquema Rico -->\n" . $markup . "\n<!-- Fim: Esquema Rico -->\n";
+    }
+
+    /**
+     * Consolida os blocos JSON-LD da extensão (data-type="esr") num único
+     * <script> com @graph, deixando intactos os blocos que não são JSON
+     * válido (ex.: código personalizado). Só consolida com 2+ nós.
+     *
+     * @param  string[]  $blocos
+     * @return string[]
+     */
+    private function combinarGraph(array $blocos): array
+    {
+        $nodes  = [];
+        $outros = [];
+
+        foreach ($blocos as $bloco) {
+            if (
+                !str_contains($bloco, 'data-type="esr"')
+                || !preg_match('#<script[^>]*>(.*?)</script>#is', $bloco, $m)
+            ) {
+                $outros[] = $bloco;
+
+                continue;
+            }
+
+            $json = json_decode(trim($m[1]), true);
+
+            if (!\is_array($json) || !isset($json['@type'])) {
+                $outros[] = $bloco;
+
+                continue;
+            }
+
+            unset($json['@context']);
+            $nodes[] = $json;
+        }
+
+        if (\count($nodes) < 2) {
+            return $blocos;
+        }
+
+        $graph = json_encode(
+            ['@context' => 'https://schema.org', '@graph' => $nodes],
+            JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+        );
+
+        if ($graph === false) {
+            return $blocos;
+        }
+
+        $combinado = "\n" . '<script type="application/ld+json" data-type="esr">' . "\n" . $graph . "\n" . '</script>';
+
+        return array_merge([$combinado], $outros);
     }
 
     /* ===================================================================
