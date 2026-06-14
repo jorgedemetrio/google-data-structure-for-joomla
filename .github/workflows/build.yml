@@ -60,3 +60,19 @@ jobs:
       - name: Rodar PHPUnit
         working-directory: tests
         run: vendor/bin/phpunit
+
+  sonarqube:
+    name: SonarQube Cloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0  # Clone completo: melhora a relevância da análise (histórico/SCM blame).
+
+      # A configuração (projectKey, organization, sources) vive em
+      # sonar-project.properties na raiz e é lida automaticamente pelo scanner.
+      # Requer o secret SONAR_TOKEN configurado no repositório.
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
