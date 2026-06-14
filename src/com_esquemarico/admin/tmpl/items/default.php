@@ -41,12 +41,12 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                 <td class="w-1 text-center">
                                     <?php echo HTMLHelper::_('grid.checkall'); ?>
                                 </td>
-                                <th class="w-1 text-center"><?php echo Text::_('JSTATUS'); ?></th>
-                                <th><?php echo Text::_('ESR_ITEM_TITLE'); ?></th>
-                                <th><?php echo Text::_('ESR_ITEM_INTEGRATION'); ?></th>
-                                <th><?php echo Text::_('ESR_ITEM_CONTENT_TYPE'); ?></th>
-                                <th class="w-5 text-center"><?php echo Text::_('JFIELD_LANGUAGE_LABEL'); ?></th>
-                                <th class="w-1 text-center"><?php echo Text::_('JGRID_HEADING_ID'); ?></th>
+                                <th scope="col" class="w-1 text-center"><?php echo Text::_('JSTATUS'); ?></th>
+                                <th scope="col"><?php echo Text::_('ESR_ITEM_TITLE'); ?></th>
+                                <th scope="col"><?php echo Text::_('ESR_ITEM_INTEGRATION'); ?></th>
+                                <th scope="col"><?php echo Text::_('ESR_ITEM_CONTENT_TYPE'); ?></th>
+                                <th scope="col" class="w-5 text-center"><?php echo Text::_('JFIELD_LANGUAGE_LABEL'); ?></th>
+                                <th scope="col" class="w-1 text-center"><?php echo Text::_('JGRID_HEADING_ID'); ?></th>
                             </tr>
                         </thead>
                         <tbody>

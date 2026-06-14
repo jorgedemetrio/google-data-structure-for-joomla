@@ -33,6 +33,9 @@ final class SeoAnalyzer
         'bad'  => 0.0,
     ];
 
+    /** Regex de espaços em branco (Unicode) reutilizada na normalização de texto. */
+    private const WHITESPACE = '/\s+/u';
+
     /**
      * Analisa os dados do artigo.
      *
@@ -172,7 +175,7 @@ final class SeoAnalyzer
 
         $missing = 0;
         foreach ($imgs[0] as $img) {
-            if (!preg_match('/\balt\s*=\s*("|\')\s*\S/i', $img)) {
+            if (!preg_match('/\balt\s*=\s*["\']\s*\S/i', $img)) {
                 $missing++;
             }
         }
@@ -252,7 +255,7 @@ final class SeoAnalyzer
         $text = strip_tags($text);
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        return trim((string) preg_replace('/\s+/u', ' ', $text));
+        return trim((string) preg_replace(self::WHITESPACE, ' ', $text));
     }
 
     private function wordCount(string $plain): int
@@ -261,12 +264,12 @@ final class SeoAnalyzer
             return 0;
         }
 
-        return \count(preg_split('/\s+/u', $plain) ?: []);
+        return \count(preg_split(self::WHITESPACE, $plain) ?: []);
     }
 
     private function firstWords(string $plain, int $n): string
     {
-        $parts = preg_split('/\s+/u', $plain) ?: [];
+        $parts = preg_split(self::WHITESPACE, $plain) ?: [];
 
         return implode(' ', \array_slice($parts, 0, $n));
     }
@@ -298,6 +301,6 @@ final class SeoAnalyzer
     {
         $s = mb_strtolower(trim($s));
 
-        return (string) preg_replace('/\s+/u', '-', $s);
+        return (string) preg_replace(self::WHITESPACE, '-', $s);
     }
 }

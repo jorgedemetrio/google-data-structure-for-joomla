@@ -22,6 +22,7 @@ use Joomla\Database\DatabaseInterface;
 class ConfigModel extends FormModel
 {
     private const CONFIG_KEY = 'config';
+    private const TABLE      = '#__esquemarico_config';
 
     public function getForm($data = [], $loadData = true)
     {
@@ -48,7 +49,7 @@ class ConfigModel extends FormModel
         $name  = self::CONFIG_KEY;
         $query = $db->getQuery(true)
             ->select($db->quoteName('params'))
-            ->from($db->quoteName('#__esquemarico_config'))
+            ->from($db->quoteName(self::TABLE))
             ->where($db->quoteName('name') . ' = :name')
             ->bind(':name', $name, \Joomla\Database\ParameterType::STRING);
 
@@ -69,7 +70,7 @@ class ConfigModel extends FormModel
         // Existe a linha?
         $check = $db->getQuery(true)
             ->select('COUNT(*)')
-            ->from($db->quoteName('#__esquemarico_config'))
+            ->from($db->quoteName(self::TABLE))
             ->where($db->quoteName('name') . ' = :name')
             ->bind(':name', $name, \Joomla\Database\ParameterType::STRING);
         $db->setQuery($check);
@@ -78,9 +79,9 @@ class ConfigModel extends FormModel
         $row = (object) ['name' => $name, 'params' => $json];
 
         if ($exists) {
-            return $db->updateObject('#__esquemarico_config', $row, 'name');
+            return $db->updateObject(self::TABLE, $row, 'name');
         }
 
-        return $db->insertObject('#__esquemarico_config', $row);
+        return $db->insertObject(self::TABLE, $row);
     }
 }

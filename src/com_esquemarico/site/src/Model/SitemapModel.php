@@ -29,6 +29,8 @@ use Joomla\Database\ParameterType;
  */
 class SitemapModel extends BaseDatabaseModel
 {
+    private const ORDER_DESC = ' DESC';
+
     private int $now;
 
     /** @var array{max: float, min: float, window: int} */
@@ -97,7 +99,7 @@ class SitemapModel extends BaseDatabaseModel
             ->where($db->quoteName('c.state') . ' = 1')
             ->whereIn($db->quoteName('c.access'), $this->levels)
             ->whereIn($db->quoteName('c.language'), $this->langs, ParameterType::STRING)
-            ->order($db->quoteName('c.modified') . ' DESC');
+            ->order($db->quoteName('c.modified') . self::ORDER_DESC);
 
         $entries = [];
 
@@ -124,7 +126,7 @@ class SitemapModel extends BaseDatabaseModel
             ->where($db->quoteName('c.id') . ' <> 1')
             ->whereIn($db->quoteName('c.access'), $this->levels)
             ->whereIn($db->quoteName('c.language'), $this->langs, ParameterType::STRING)
-            ->order($db->quoteName('c.modified_time') . ' DESC');
+            ->order($db->quoteName('c.modified_time') . self::ORDER_DESC);
 
         $entries = [];
 
@@ -194,7 +196,7 @@ class SitemapModel extends BaseDatabaseModel
             ->where($db->quoteName('t.parent_id') . ' <> 0')
             ->whereIn($db->quoteName('t.access'), $this->levels)
             ->whereIn($db->quoteName('t.language'), $this->langs, ParameterType::STRING)
-            ->order($db->quoteName('t.modified_time') . ' DESC');
+            ->order($db->quoteName('t.modified_time') . self::ORDER_DESC);
 
         $entries = [];
 

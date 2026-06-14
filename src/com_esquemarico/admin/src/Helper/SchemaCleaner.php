@@ -65,7 +65,7 @@ final class SchemaCleaner
             return 0;
         }
 
-        $re = '/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/msi';
+        $re = '/<script[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/msi';
 
         if (!preg_match_all($re, $text, $matches, PREG_SET_ORDER)) {
             return 0;

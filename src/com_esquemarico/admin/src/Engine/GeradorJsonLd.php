@@ -79,14 +79,7 @@ final class GeradorJsonLd
      */
     public function generate(): ?string
     {
-        $type   = (string) $this->data->get('contentType');
-        $method = 'contentType' . $type;
-
-        if (!method_exists($this, $method)) {
-            return null;
-        }
-
-        $content = $this->$method();
+        $content = $this->buildContent(strtolower((string) $this->data->get('contentType')));
 
         if (!$content) {
             return null;
@@ -143,6 +136,42 @@ final class GeradorJsonLd
 
             return $value !== null && $value !== false && $value !== '';
         });
+    }
+
+    /**
+     * Despacha para o construtor do tipo de conteúdo.
+     *
+     * Allowlist explícita: o nome do método nunca é derivado diretamente do
+     * valor de entrada (evita construção de nome de método a partir de dado
+     * controlável). Tipo desconhecido devolve null.
+     */
+    private function buildContent(string $type): array|string|null
+    {
+        return match ($type) {
+            'article'        => $this->contentTypeArticle(),
+            'book'           => $this->contentTypeBook(),
+            'course'         => $this->contentTypeCourse(),
+            'event'          => $this->contentTypeEvent(),
+            'product'        => $this->contentTypeProduct(),
+            'movie'          => $this->contentTypeMovie(),
+            'recipe'         => $this->contentTypeRecipe(),
+            'review'         => $this->contentTypeReview(),
+            'factcheck'      => $this->contentTypeFactCheck(),
+            'video'          => $this->contentTypeVideo(),
+            'jobposting'     => $this->contentTypeJobPosting(),
+            'faq'            => $this->contentTypeFAQ(),
+            'howto'          => $this->contentTypeHowTo(),
+            'localbusiness'  => $this->contentTypeLocalBusiness(),
+            'service'        => $this->contentTypeService(),
+            'person'         => $this->contentTypePerson(),
+            'organization'   => $this->contentTypeOrganization(),
+            'custom_code'    => $this->contentTypeCustom_Code(),
+            'website'        => $this->contentTypeWebsite(),
+            'logo'           => $this->contentTypeLogo(),
+            'socialprofiles' => $this->contentTypeSocialProfiles(),
+            'breadcrumbs'    => $this->contentTypeBreadcrumbs(),
+            default          => null,
+        };
     }
 
     /* ===================================================================
@@ -688,9 +717,12 @@ final class GeradorJsonLd
         $salary = $this->data->get('salary');
 
         if ($salary) {
-            $value = \is_array($salary) && \count($salary) > 1
-                ? ['minValue' => trim((string) $salary[0]), 'maxValue' => trim((string) $salary[1])]
-                : ['value' => \is_array($salary) ? ($salary[0] ?? null) : $salary];
+            if (\is_array($salary) && \count($salary) > 1) {
+                $value = ['minValue' => trim((string) $salary[0]), 'maxValue' => trim((string) $salary[1])];
+            } else {
+                $single = \is_array($salary) ? ($salary[0] ?? null) : $salary;
+                $value  = ['value' => $single];
+            }
 
             $json['baseSalary'] = [
                 '@type'    => 'MonetaryAmount',
