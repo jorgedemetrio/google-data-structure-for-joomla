@@ -172,7 +172,7 @@
         <field name="sitemap_priority_min" type="number"
             label="ESR_CFG_SITEMAP_MIN" description="ESR_CFG_SITEMAP_MIN_DESC"
             default="0.1" min="0.0" max="1.0" step="0.1" />
-        <field name="sitemap_urls" type="note"
+        <field name="sitemap_urls" type="sitemapurl"
             label="ESR_CFG_SITEMAP_URLS"
             description="ESR_CFG_SITEMAP_URLS_DESC" />
     </fieldset>
