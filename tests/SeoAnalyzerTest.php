@@ -27,7 +27,7 @@ final class SeoAnalyzerTest extends TestCase
     /**
      * Status de uma verificação pelo id, ou null se ausente.
      */
-    private function status(array $result, string $id): ?string
+    private function statusDe(array $result, string $id): ?string
     {
         foreach ($result['checks'] as $c) {
             if ($c['id'] === $id) {
@@ -44,64 +44,64 @@ final class SeoAnalyzerTest extends TestCase
 
         $this->assertLessThan(30, $r['score']);
         $this->assertSame('bad', $r['rating']);
-        $this->assertSame('bad', $this->status($r, 'fk_set'));   // sem palavra-chave de foco
-        $this->assertNull($this->status($r, 'fk_in_title'));     // checks de FK não rodam
+        $this->assertSame('bad', $this->statusDe($r, 'fk_set'));   // sem palavra-chave de foco
+        $this->assertNull($this->statusDe($r, 'fk_in_title'));     // checks de FK não rodam
     }
 
     public function testTituloTamanhoIdeal(): void
     {
         $r = $this->a->analyze(['title' => str_repeat('a', 50)]);
-        $this->assertSame('good', $this->status($r, 'title_length'));
+        $this->assertSame('good', $this->statusDe($r, 'title_length'));
     }
 
     public function testTituloCurtoOuLongo(): void
     {
-        $this->assertSame('bad', $this->status($this->a->analyze(['title' => 'Curto']), 'title_length'));
-        $this->assertSame('bad', $this->status($this->a->analyze(['title' => str_repeat('a', 90)]), 'title_length'));
-        $this->assertSame('ok', $this->status($this->a->analyze(['title' => str_repeat('a', 35)]), 'title_length'));
+        $this->assertSame('bad', $this->statusDe($this->a->analyze(['title' => 'Curto']), 'title_length'));
+        $this->assertSame('bad', $this->statusDe($this->a->analyze(['title' => str_repeat('a', 90)]), 'title_length'));
+        $this->assertSame('ok', $this->statusDe($this->a->analyze(['title' => str_repeat('a', 35)]), 'title_length'));
     }
 
     public function testMetadescricao(): void
     {
-        $this->assertSame('good', $this->status($this->a->analyze(['metadesc' => str_repeat('a', 140)]), 'metadesc'));
-        $this->assertSame('ok', $this->status($this->a->analyze(['metadesc' => str_repeat('a', 80)]), 'metadesc'));
-        $this->assertSame('bad', $this->status($this->a->analyze(['metadesc' => '']), 'metadesc'));
+        $this->assertSame('good', $this->statusDe($this->a->analyze(['metadesc' => str_repeat('a', 140)]), 'metadesc'));
+        $this->assertSame('ok', $this->statusDe($this->a->analyze(['metadesc' => str_repeat('a', 80)]), 'metadesc'));
+        $this->assertSame('bad', $this->statusDe($this->a->analyze(['metadesc' => '']), 'metadesc'));
     }
 
     public function testMetakeywords(): void
     {
-        $this->assertSame('good', $this->status($this->a->analyze(['metakey' => 'cafe, graos']), 'metakeywords'));
-        $this->assertSame('bad', $this->status($this->a->analyze(['metakey' => '']), 'metakeywords'));
+        $this->assertSame('good', $this->statusDe($this->a->analyze(['metakey' => 'cafe, graos']), 'metakeywords'));
+        $this->assertSame('bad', $this->statusDe($this->a->analyze(['metakey' => '']), 'metakeywords'));
     }
 
     public function testVolumeDeConteudo(): void
     {
-        $this->assertSame('good', $this->status($this->a->analyze(['text' => str_repeat('palavra ', 700)]), 'content_length'));
-        $this->assertSame('ok', $this->status($this->a->analyze(['text' => str_repeat('palavra ', 350)]), 'content_length'));
-        $this->assertSame('bad', $this->status($this->a->analyze(['text' => str_repeat('palavra ', 100)]), 'content_length'));
+        $this->assertSame('good', $this->statusDe($this->a->analyze(['text' => str_repeat('palavra ', 700)]), 'content_length'));
+        $this->assertSame('ok', $this->statusDe($this->a->analyze(['text' => str_repeat('palavra ', 350)]), 'content_length'));
+        $this->assertSame('bad', $this->statusDe($this->a->analyze(['text' => str_repeat('palavra ', 100)]), 'content_length'));
     }
 
     public function testImagensSemAlt(): void
     {
         $semAlt = $this->a->analyze(['text' => '<img src="a.jpg"><img src="b.jpg" alt="ok">']);
-        $this->assertSame('bad', $this->status($semAlt, 'images_alt'));
+        $this->assertSame('bad', $this->statusDe($semAlt, 'images_alt'));
 
         $comAlt = $this->a->analyze(['text' => '<img src="a.jpg" alt="x"><img src="b.jpg" alt="y">']);
-        $this->assertSame('good', $this->status($comAlt, 'images_alt'));
+        $this->assertSame('good', $this->statusDe($comAlt, 'images_alt'));
 
         $sem = $this->a->analyze(['text' => 'sem imagens aqui']);
-        $this->assertSame('ok', $this->status($sem, 'images_alt'));
+        $this->assertSame('ok', $this->statusDe($sem, 'images_alt'));
     }
 
     public function testLinksESubtitulos(): void
     {
         $r = $this->a->analyze(['text' => '<h2>Seção</h2> texto <a href="/loja">loja</a>']);
-        $this->assertSame('good', $this->status($r, 'links'));
-        $this->assertSame('good', $this->status($r, 'subheadings'));
+        $this->assertSame('good', $this->statusDe($r, 'links'));
+        $this->assertSame('good', $this->statusDe($r, 'subheadings'));
 
         $r2 = $this->a->analyze(['text' => 'texto simples sem nada']);
-        $this->assertSame('bad', $this->status($r2, 'links'));
-        $this->assertSame('bad', $this->status($r2, 'subheadings'));
+        $this->assertSame('bad', $this->statusDe($r2, 'links'));
+        $this->assertSame('bad', $this->statusDe($r2, 'subheadings'));
     }
 
     public function testPalavraChaveNoTituloEDescricao(): void
@@ -112,17 +112,17 @@ final class SeoAnalyzerTest extends TestCase
             'focus_keyword' => 'cafe especial',
         ]);
 
-        $this->assertSame('good', $this->status($r, 'fk_in_title'));
-        $this->assertSame('good', $this->status($r, 'fk_in_metadesc'));
+        $this->assertSame('good', $this->statusDe($r, 'fk_in_title'));
+        $this->assertSame('good', $this->statusDe($r, 'fk_in_metadesc'));
     }
 
     public function testPalavraChaveNaUrl(): void
     {
         $bom = $this->a->analyze(['alias' => 'guia-cafe-especial', 'focus_keyword' => 'cafe especial']);
-        $this->assertSame('good', $this->status($bom, 'fk_in_url'));
+        $this->assertSame('good', $this->statusDe($bom, 'fk_in_url'));
 
         $ruim = $this->a->analyze(['alias' => 'outro-assunto', 'focus_keyword' => 'cafe especial']);
-        $this->assertSame('bad', $this->status($ruim, 'fk_in_url'));
+        $this->assertSame('bad', $this->statusDe($ruim, 'fk_in_url'));
     }
 
     public function testDensidadeDaPalavraChave(): void
@@ -132,14 +132,14 @@ final class SeoAnalyzerTest extends TestCase
             'text'          => str_repeat('palavra ', 198) . 'cafe cafe',
             'focus_keyword' => 'cafe',
         ]);
-        $this->assertSame('good', $this->status($r, 'fk_density'));
+        $this->assertSame('good', $this->statusDe($r, 'fk_density'));
 
         // Sem ocorrências => densidade 0 => ruim.
         $r0 = $this->a->analyze([
             'text'          => str_repeat('palavra ', 200),
             'focus_keyword' => 'cafe',
         ]);
-        $this->assertSame('bad', $this->status($r0, 'fk_density'));
+        $this->assertSame('bad', $this->statusDe($r0, 'fk_density'));
     }
 
     public function testArtigoBemOtimizadoPontuaAlto(): void
