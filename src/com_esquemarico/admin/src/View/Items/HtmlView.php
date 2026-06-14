@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
 \defined('_JEXEC') or die;
@@ -68,7 +69,10 @@ class HtmlView extends BaseHtmlView
         }
 
         if ($user->authorise('core.admin', 'com_esquemarico')) {
-            ToolbarHelper::preferences('com_esquemarico');
+            Toolbar::getInstance()->linkButton('config')
+                ->text('COM_ESQUEMARICO_SUBMENU_CONFIG')
+                ->url('index.php?option=com_esquemarico&view=config')
+                ->icon('icon-cog');
         }
     }
 }

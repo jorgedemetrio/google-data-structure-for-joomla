@@ -45,13 +45,13 @@ class ConfigModel extends FormModel
     public function getConfigData(): array
     {
         $db    = Factory::getContainer()->get(DatabaseInterface::class);
+        $name  = self::CONFIG_KEY;
         $query = $db->getQuery(true)
             ->select($db->quoteName('params'))
             ->from($db->quoteName('#__esquemarico_config'))
             ->where($db->quoteName('name') . ' = :name')
             ->bind(':name', $name, \Joomla\Database\ParameterType::STRING);
 
-        $name = self::CONFIG_KEY;
         $db->setQuery($query);
 
         return json_decode($db->loadResult() ?: '{}', true) ?: [];

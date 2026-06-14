@@ -60,7 +60,8 @@ final class SchemaCleaner
      */
     private static function removeJsonSchema(string &$text, string $schemaType): int
     {
-        if (StringHelper::strpos($text, '//schema.org/') === false) {
+        // Aceita o contexto com ou sem barra final (https://schema.org e https://schema.org/).
+        if (StringHelper::strpos($text, 'schema.org') === false) {
             return 0;
         }
 

@@ -14,6 +14,7 @@ use Esquemarico\Core\Extension as ExtensionHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
 \defined('_JEXEC') or die;
@@ -44,7 +45,10 @@ class HtmlView extends BaseHtmlView
         ToolbarHelper::title(Text::_('COM_ESQUEMARICO_PAINEL_TITLE'), 'star');
 
         if (Factory::getApplication()->getIdentity()->authorise('core.admin', 'com_esquemarico')) {
-            ToolbarHelper::preferences('com_esquemarico');
+            Toolbar::getInstance()->linkButton('config')
+                ->text('COM_ESQUEMARICO_SUBMENU_CONFIG')
+                ->url('index.php?option=com_esquemarico&view=config')
+                ->icon('icon-cog');
         }
     }
 }
