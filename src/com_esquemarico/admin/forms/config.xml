@@ -66,6 +66,24 @@
             label="ESR_CFG_SOCIAL_OTHER" description="ESR_CFG_SOCIAL_OTHER_DESC" />
     </fieldset>
 
+    <fieldset name="titles" label="ESR_CFG_TITLES">
+        <field name="titles_note" type="note"
+            label="ESR_CFG_TITLES" description="ESR_CFG_TITLES_DESC" />
+        <field name="title_template_enabled" type="radio" layout="joomla.form.field.radio.switcher"
+            label="JENABLED" description="ESR_CFG_TITLES_ENABLED_DESC" default="0">
+            <option value="0">JNO</option>
+            <option value="1">JYES</option>
+        </field>
+        <field name="title_template" type="text" class="input-xxlarge"
+            label="ESR_CFG_TITLES_TEMPLATE" description="ESR_CFG_TITLES_TEMPLATE_DESC"
+            default="%title% %sep% %sitename%" showon="title_template_enabled:1" />
+        <field name="title_separator" type="text"
+            label="ESR_CFG_TITLES_SEPARATOR" default="-" showon="title_template_enabled:1" />
+        <field name="title_home" type="text" class="input-xxlarge"
+            label="ESR_CFG_TITLES_HOME" description="ESR_CFG_TITLES_HOME_DESC"
+            showon="title_template_enabled:1" />
+    </fieldset>
+
     <fieldset name="opengraph" label="ESR_CFG_OPENGRAPH">
         <field name="og_note" type="note"
             label="ESR_CFG_OPENGRAPH" description="ESR_CFG_OPENGRAPH_DESC" />

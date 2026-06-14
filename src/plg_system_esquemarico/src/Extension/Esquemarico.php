@@ -70,6 +70,7 @@ final class Esquemarico extends CMSPlugin implements SubscriberInterface
             Factory::getApplication()->getDocument()->addCustomTag($markup);
         }
 
+        $this->aplicarTemplateTitulo();
         $this->metaCanonicalERobos();
         $this->controleSnippetRobos();
         $this->metaOpenGraph();
@@ -301,6 +302,52 @@ final class Esquemarico extends CMSPlugin implements SubscriberInterface
         $robots = $robots === '' ? $value : $robots . ', ' . $value;
 
         $doc->setMetaData('robots', $robots);
+    }
+
+    /* ===================================================================
+     *  Template de título (<title>)
+     * =================================================================== */
+
+    /**
+     * Reescreve o <title> a partir de um template configurável, com variáveis
+     * %title%, %sitename% e %sep%. A home pode ter um título próprio. Opt-in.
+     *
+     * Use com a opção "Nome do site nos títulos das páginas" do Joomla
+     * desligada, para o nome do site não aparecer duplicado.
+     */
+    private function aplicarTemplateTitulo(): void
+    {
+        if (!$this->globais->get('title_template_enabled', 0)) {
+            return;
+        }
+
+        $doc  = Factory::getApplication()->getDocument();
+        $home = EsquemaRicoHelper::isFrontPage() ? trim((string) $this->globais->get('title_home', '')) : '';
+
+        if ($home !== '') {
+            $doc->setTitle($home);
+
+            return;
+        }
+
+        $template = trim((string) $this->globais->get('title_template', '%title% %sep% %sitename%'));
+
+        if ($template === '') {
+            return;
+        }
+
+        $novo = strtr($template, [
+            '%title%'    => (string) $doc->getTitle(),
+            '%sitename%' => EsquemaRicoHelper::getSiteName(),
+            '%sep%'      => (string) $this->globais->get('title_separator', '-'),
+        ]);
+
+        // Colapsa espaços duplicados (ex.: quando %title% resolve para vazio).
+        $novo = trim((string) preg_replace('/\s{2,}/', ' ', $novo));
+
+        if ($novo !== '') {
+            $doc->setTitle($novo);
+        }
     }
 
     /* ===================================================================
