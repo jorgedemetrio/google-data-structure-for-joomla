@@ -15,6 +15,7 @@ use Esquemarico\Core\Functions;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\CMS\Uri\Uri;
 use Joomla\Component\Esquemarico\Administrator\Engine\GeradorJsonLd;
 use Joomla\Component\Esquemarico\Administrator\Helper\EsquemaRicoHelper;
 use Joomla\Component\Esquemarico\Administrator\Helper\SchemaCleaner;
@@ -70,6 +71,7 @@ final class Esquemarico extends CMSPlugin implements SubscriberInterface
         }
 
         $this->controleSnippetRobos();
+        $this->metaOpenGraph();
     }
 
     /**
@@ -298,6 +300,73 @@ final class Esquemarico extends CMSPlugin implements SubscriberInterface
         $robots = $robots === '' ? $value : $robots . ', ' . $value;
 
         $doc->setMetaData('robots', $robots);
+    }
+
+    /* ===================================================================
+     *  Open Graph / Twitter Cards
+     * =================================================================== */
+
+    /**
+     * Gera as meta tags Open Graph e Twitter Cards a partir dos metadados da
+     * página (título, descrição, URL) e da identidade do site. Não sobrescreve
+     * tags já definidas pelo template ou por outra extensão.
+     */
+    private function metaOpenGraph(): void
+    {
+        if (!$this->globais->get('og_enabled', 1)) {
+            return;
+        }
+
+        $app   = Factory::getApplication();
+        $doc   = $app->getDocument();
+        $title = (string) ($doc->getTitle() ?: EsquemaRicoHelper::getSiteName());
+        $desc  = (string) $doc->getDescription();
+        $image = (string) ($this->globais->get('og_default_image') ?: EsquemaRicoHelper::getSiteLogo());
+        $image = $image !== '' ? (string) EsquemaRicoHelper::cleanImage($image) : '';
+
+        $og = [
+            'og:locale'      => str_replace('-', '_', $app->getLanguage()->getTag()),
+            'og:type'        => EsquemaRicoHelper::isFrontPage() ? 'website' : 'article',
+            'og:title'       => $title,
+            'og:description' => $desc,
+            'og:url'         => Uri::current(),
+            'og:site_name'   => EsquemaRicoHelper::getSiteName(),
+            'og:image'       => $image,
+        ];
+
+        foreach ($og as $prop => $value) {
+            $this->definirMeta($doc, $prop, (string) $value, 'property');
+        }
+
+        // Twitter Cards espelham o Open Graph.
+        $handle  = trim((string) $this->globais->get('og_twitter_site'));
+        $twitter = [
+            'twitter:card'        => (string) $this->globais->get('og_twitter_card', 'summary_large_image'),
+            'twitter:title'       => $title,
+            'twitter:description' => $desc,
+            'twitter:image'       => $image,
+        ];
+
+        if ($handle !== '') {
+            $twitter['twitter:site'] = str_starts_with($handle, '@') ? $handle : '@' . $handle;
+        }
+
+        foreach ($twitter as $name => $value) {
+            $this->definirMeta($doc, $name, (string) $value, 'name');
+        }
+    }
+
+    /**
+     * Define uma meta tag apenas se houver valor e ela ainda não existir
+     * (não sobrescreve o que o template ou outra extensão já definiu).
+     */
+    private function definirMeta(object $doc, string $key, string $value, string $attribute): void
+    {
+        if ($value === '' || (string) $doc->getMetaData($key, $attribute) !== '') {
+            return;
+        }
+
+        $doc->setMetaData($key, $value, $attribute);
     }
 
     /* ===================================================================
